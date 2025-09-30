@@ -3,67 +3,66 @@
 ---
 <section id="findings" class="content-section">
   <div class="section-container">
-    <h2 class="section-title">Findings</h2>
+    <h2 class="section-title">Key Findings</h2>
     
     <div class="findings-components">
       <div class="finding-card" id="finding-card-1">
         <div class="finding-header">
-          <h3 class="finding-title">Finding 1: Single-turn RL may not be directly adapted to Multi-turn agent RL</h3>
+          <h3 class="finding-title">Finding 1: Dynamic decomposition cuts inference error</h3>
           <div class="expand-icon">-</div>
         </div>
         <div class="finding-content active" id="finding-content-1">
-          <p> Vanilla adaptations from single-turn methods like PPO and GRPO achieve early gains in agent settings but often collapse. A critic in PPO may delay instability, but would not prevent reasoning degradation, highlighting the need for specialized stabilization in agent settings. </p>
+          <p>Across APPS, MATH500, and LiveCodeBench, DISC lowers pass@10 error by 5.0%, 6.7%, and 10.5% relative to the best static baseline. The gains compound on the hardest competition problems where sampling budget is scarce.</p>
         </div>
       </div>
       
       <div class="finding-card" id="finding-card-2">
         <div class="finding-header">
-          <h3 class="finding-title">Finding 2: Model collapse in agent RL is reflected as "Echo Trap" over training</h3>
+          <h3 class="finding-title">Finding 2: Compute concentrates on pivotal tokens</h3>
           <div class="expand-icon">-</div>
         </div>
         <div class="finding-content active" id="finding-content-2">
-          <p>We find that early-stage agent respond with diverse symbolic reasoning, but collapse into deterministic, repetitive templates after training. Models converge to fixed phrasing, indicating that RL may reinforce superficial patterns instead of general reasoning and forms an "Echo Trap" that hinders long-term generalization.</p>
+          <p>DISC repeatedly splits critical prefixes such as connective words and control tokens. These pivots steer the downstream reasoning, so the algorithm allocates more sampling budget there instead of overspending on settled regions.</p>
         </div>
       </div>
       
       <div class="finding-card" id="finding-card-3">
         <div class="finding-header">
-          <h3 class="finding-title">Finding 3: Collapse follows similar dynamics and can be anticipated by indicators</h3>
+          <h3 class="finding-title">Finding 3: Works across model families</h3>
           <div class="expand-icon">-</div>
         </div>
         <div class="finding-content active" id="finding-content-3">
-          <p>Reward standard deviation and entropy often fluctuate before performance degrades, while gradient norm spikes typically mark the point of irreversible collapse. These metrics provide early indicators and motivate the need for stabilization strategies.</p>
+          <p>From lightweight LLaMA and Mistral checkpoints to proprietary reasoning models such as R1, DISC consistently boosts accuracy. For LLaMA the pass@10 rate jumps from 0.01 to 0.04—a threefold relative lift.</p>
         </div>
       </div>
       
       <div class="finding-card" id="finding-card-4">
         <div class="finding-header">
-          <h3 class="finding-title">Finding 4: Filtering low-variance trajectories improves stability and efficiency</h3>
+          <h3 class="finding-title">Finding 4: Plug-and-play with search algorithms</h3>
           <div class="expand-icon">-</div>
         </div>
         <div class="finding-content active" id="finding-content-4">
-          <p>Training on high-variance prompts delays or eliminates collapse in multi-turn RL. StarPO-S improves performance and reduces update steps by discarding low-information rollouts, especially under PPO. This aligns with active learning principles, where uncertain examples offer the most informative learning signals.</p>
+          <p>The same decomposition operator drives greedy search, beam search, or MCTS. DISC expands nodes until rewards plateau, then contracts, providing precise control over inference-time compute without new hyperparameters.</p>
         </div>
       </div>
       
       <div class="finding-card" id="finding-card-5">
         <div class="finding-header">
-          <h3 class="finding-title">Finding 5: Task diversity,  action budget, and rollout frequency affect data quality</h3>
+          <h3 class="finding-title">Finding 5: Token efficiency improves with adaptive budgets</h3>
           <div class="expand-icon">-</div>
         </div>
         <div class="finding-content active" id="finding-content-5">
-          <p>Diverse task instances enable better policy contrast and generalization across environments.
-            Moderate action budgets provide enough planning space and avoid the noise introduced by overly long sequences. Up-to-date rollouts ensure optimization targets remain aligned with current policy behavior. </p>
+          <p>Under the same token budget, DISC recovers higher accuracy than sentence-level or token-level decomposition. When the sample budget is fixed, DISC returns better solutions with fewer tokens.</p>
         </div>
       </div>
       
       <div class="finding-card" id="finding-card-6">
         <div class="finding-header">
-          <h3 class="finding-title">Finding 6: Reasoning fails to emerge without meticulous reward design</h3>
+          <h3 class="finding-title">Finding 6: Minimal assumptions enable fast deployment</h3>
           <div class="expand-icon">-</div>
         </div>
         <div class="finding-content active" id="finding-content-6">
-          While symbolic reasoning can emerge in simple, single-turn tasks under weak supervision, it fails to persist in multi-turn environments without the reward design explicitly encouraging interpretable intermediate reasoning steps. We observe that even with structured prompts, reasoning gradually decays during training if the reward signal focuses only on final outcomes. This suggests that without meticulous reward shaping, agents may tend to collapse into shortcut behaviors that bypass reasoning altogether.
+          DISC only needs scalar rewards to drive decomposition. Unit tests, verifiers, or self-critique models can play that role, avoiding handcrafted heuristics or process reward models.
         </div>
       </div>
     </div>

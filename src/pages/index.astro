@@ -14,7 +14,7 @@ import '../styles/authors.css';
 import '../styles/resources.css';
 import '../styles/trajectoryViewer.css';
 
-const pageTitle = "RAGEN - RL Agent";
+const pageTitle = "DISC: Dynamic Decomposition";
 ---
 <Layout title={pageTitle}>
   <Hero />
@@ -26,15 +26,11 @@ const pageTitle = "RAGEN - RL Agent";
 </Layout>
 
 <script>
-  import { initTrajectoryViewer } from '../scripts/trajectoryViewer';
   import { initCitationCopy } from '../scripts/citation';
 
   document.addEventListener('DOMContentLoaded', () => {
     // Initialize citation copy functionality
     initCitationCopy();
-    
-    // Initialize trajectory viewer
-    initTrajectoryViewer();
 
     // Text animation for hero section
     const animateTitle = () => {
