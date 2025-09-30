@@ -159,6 +159,13 @@ animation: revealSubtitle 1s forwards;
   margin-bottom: 0.6rem;
 }
 
+.diagram-document {
+  width: 100%;
+  height: min(70vh, 700px);
+  border: none;
+  margin-bottom: 0.6rem;
+}
+
 
 /* Author link styles */
 .authors-list a {
