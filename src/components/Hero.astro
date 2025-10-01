@@ -25,8 +25,8 @@
 
   <div class="hero-metrics">
     <div class="metric-card">
-      <span class="metric-value">-5.0%</span>
-      <span class="metric-label">pass@10 error on APPS</span>
+      <span class="metric-value">+33%</span>
+      <span class="metric-label">Accuracy gain vs Deepseek R1 at equal tokens</span>
     </div>
     <div class="metric-card">
       <span class="metric-value">-6.7%</span>
@@ -183,12 +183,18 @@
     line-height: 1.6;
   }
 
+  .diagram-placeholder {
+    display: flex;
+    justify-content: center;
+  }
+
   .diagram-image {
     width: min(100%, 900px);
     height: auto;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
     display: block;
+    margin: 0 auto;
   }
 
   .affiliations {
