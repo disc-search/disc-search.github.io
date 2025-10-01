@@ -47,6 +47,37 @@ const highlights = [
       focuses on the most uncertain parts of the trajectory while skipping past the easy ones.
     </p>
 
+    <div class="decomposition-card" aria-labelledby="decomposition-title">
+      <div class="decomposition-title" id="decomposition-title">\decomp example decomposition</div>
+      <div class="decomposition-body">
+        <p>
+          <span class="tone-high">[ Let the length of the rectangle be <span class="math-symbol">l</span> ]</span>
+          <span class="tone-medium">
+            [ and the width of the rectangle be <span class="math-symbol">w</span>. Since the perimeter of the rectangle is 24 inches,
+            we have that <span class="math-symbol">2l + 2w = 24</span>, so <span class="math-symbol">l + w = 12</span>. We wish to maximize the area of the
+            rectangle, ]
+          </span>
+          <span class="tone-high">[ which ]</span>
+        </p>
+        <p class="tone-low">[ is <span class="math-symbol">A = lw</span>. Let <span class="math-symbol">l = 12 - w</span> and plug into the area: ]</p>
+        <div class="math-line tone-low">
+          <span class="math-symbol">A = (12 - w)w ⇒ A = 12w - w<sup>2</sup></span>
+        </div>
+        <p class="tone-low">Now, we differentiate <span class="math-symbol">A</span> with respect to <span class="math-symbol">w</span>:</p>
+        <div class="math-line tone-low">
+          <span class="math-symbol">A'(w) = 12 - 2w</span>
+        </div>
+        <p class="tone-low">We wish to maximize <span class="math-symbol">A</span>, so we set <span class="math-symbol">A'(w) = 0</span>, and solve for <span class="math-symbol">w</span>:</p>
+        <div class="math-line tone-low">
+          <span class="math-symbol">12 - 2w = 0 ⇒ w = 6</span>
+        </div>
+        <p class="tone-low">
+          Since <span class="math-symbol">l = 12 - w</span>, we have that <span class="math-symbol">l = 12 - 6 = 6</span>. Therefore, the area of the rectangle is
+          <span class="math-symbol">A = lw = 6 · 6 = </span><span class="final-answer">36</span>.
+        </p>
+      </div>
+    </div>
+
     <div class="workflow-grid">
       {workflowSteps.map((step) => (
         <article class="workflow-card">
@@ -96,6 +127,69 @@ const highlights = [
     margin: 0 auto 2.5rem auto;
     font-size: 1.1rem;
     color: #3f4455;
+  }
+
+  .decomposition-card {
+    background: #ffffff;
+    border-left: 6px solid #2a2f6c;
+    border-radius: 18px;
+    box-shadow: 0 12px 32px rgba(42, 47, 108, 0.12);
+    padding: 1.75rem 2rem;
+    margin: 0 auto 3rem auto;
+    max-width: 820px;
+  }
+
+  .decomposition-title {
+    font-weight: 700;
+    color: #2a2f6c;
+    font-size: 1.15rem;
+    margin-bottom: 1rem;
+  }
+
+  .decomposition-body {
+    display: grid;
+    gap: 0.9rem;
+    color: #3f4455;
+  }
+
+  .decomposition-body p {
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .math-line {
+    background: rgba(42, 47, 108, 0.05);
+    border-radius: 10px;
+    padding: 0.6rem 0.9rem;
+    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  }
+
+  .tone-high {
+    color: #2a2f6c;
+    font-weight: 600;
+  }
+
+  .tone-medium {
+    color: #50578c;
+  }
+
+  .tone-low {
+    color: #3f4455;
+  }
+
+  .math-symbol {
+    font-style: italic;
+  }
+
+  .final-answer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.1rem 0.5rem;
+    border-radius: 6px;
+    background: rgba(42, 47, 108, 0.12);
+    font-weight: 700;
+    color: #2a2f6c;
   }
 
   .workflow-grid {
@@ -189,6 +283,11 @@ const highlights = [
   @media (max-width: 900px) {
     .workflow-grid {
       grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    .decomposition-card {
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
     }
 
     .highlight-banner {
