@@ -23,16 +23,22 @@ const benchmarkCards = [
 
 const generalityCards = [
   {
-    title: 'Open-source LLMs',
-    text: 'LLaMA-3.1-8B accuracy rises from 0.01 to 0.04; Mistral jumps from 0.0 to 0.02; Qwen climbs from 0.095 to 0.17.'
+    dataset: 'Deepseek-R1',
+    metric: 'pass@10 accuracy ↑',
+    detail: 'Accuracy lifts by over 85% with only ten sampled reasoning traces.',
+    highlight: 'Maintains a 33% relative improvement when matched to the base model token budget.'
   },
   {
-    title: 'Reasoning specialists',
-    text: 'Applied to proprietary R1 models, DISC delivers an 85% relative gain with only ten samples per query.'
+    dataset: 'LLaMA-3.1-8B',
+    metric: 'pass@10 accuracy ↑',
+    detail: 'pass@10 rate jumps from 0.01 to 0.04 on APPS coding problems.',
+    highlight: '4x gain (300% relative increase) within the same low sampling budget.'
   },
   {
-    title: 'Search integration',
-    text: 'Beam search and MCTS inherit the same adaptive step policy, pruning low-reward prefixes early to save calls.'
+    dataset: 'Qwen-2.5-7B',
+    metric: 'pass@10 accuracy ↑',
+    detail: 'Scores climb from 0.095 to 0.17 across budget-constrained runs.',
+    highlight: '79% relative increase while preserving resource efficiency.'
   }
 ];
 ---
@@ -60,8 +66,12 @@ const generalityCards = [
     <div class="generality-grid">
       {generalityCards.map((card) => (
         <article class="generality-card">
-          <h3>{card.title}</h3>
-          <p>{card.text}</p>
+          <header>
+            <h3>{card.dataset}</h3>
+            <p class="metric">{card.metric}</p>
+          </header>
+          <p>{card.detail}</p>
+          <p class="highlight">{card.highlight}</p>
         </article>
       ))}
     </div>
@@ -126,10 +136,17 @@ const generalityCards = [
     background: #f1f3f9;
     border-radius: 14px;
     padding: 1.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .generality-card header {
+    margin-bottom: 0.25rem;
   }
 
   .generality-card h3 {
-    margin-top: 0;
+    margin: 0;
     color: #2a2f6c;
     font-size: 1.15rem;
   }
@@ -138,6 +155,13 @@ const generalityCards = [
     margin: 0;
     color: #485065;
     line-height: 1.6;
+  }
+
+  .generality-card .highlight {
+    font-weight: 600;
+    color: #1f2752;
+    border-top: 1px dashed rgba(42, 47, 108, 0.25);
+    padding-top: 0.75rem;
   }
 
   @media (max-width: 900px) {
