@@ -40,56 +40,66 @@ const highlights = [
 
 const stepDefinitions = [
   {
+    id: 'introCombined',
+    html:
+      `[Let the length of the rectangle be ( l ), width be ( w ). We want to maximize the area ( A = lw ) subject to the constraint ( 2l + 2w = 24 ).]`,
+    colorClass: 'step-color-setup'
+  },
+  {
     id: 'setup',
-    html: `[ Let the length of the rectangle be <span class="math-symbol">l</span> ]`,
+    html: `[ Let the length of the rectangle be ( l ) ]`,
     colorClass: 'step-color-setup'
   },
   {
     id: 'constraint',
-    html: `[ and the width of the rectangle be <span class="math-symbol">w</span>. Since the perimeter of the rectangle is 24 inches, we have that <span class="math-symbol">2l + 2w = 24</span>, so <span class="math-symbol">l + w = 12</span>. We wish to maximize the area of the rectangle, ]`,
+    html:
+      `[ and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, ]`,
     colorClass: 'step-color-constraint'
   },
   {
-    id: 'bridge',
+    id: 'whichBecause',
+    html:
+      `[ which because of the constraint can be expressed as ( A = lw = l(12 - l) = 12l - l^2 ). To find the maximum area, we take the derivative of ( A ) with respect to ( l ) and set it to zero:]`,
+    colorClass: 'step-color-derivative'
+  },
+  {
+    id: 'which',
+    html: `[ which]`,
+    colorClass: 'step-color-bridge'
+  },
+  {
+    id: 'whichFinal',
     html: `[ which ]`,
     colorClass: 'step-color-bridge'
   },
   {
-    id: 'objective',
-    html: `[ is <span class="math-symbol">A = lw</span>. Let <span class="math-symbol">l = 12 - w</span> and plug into the area: ]`,
-    colorClass: 'step-color-objective'
-  },
-  {
-    id: 'mathExpand',
+    id: 'finalDerivation',
     html:
-      '<div class="math-line"><span class="math-symbol">A = (12 - w)w ⇒ A = 12w - w<sup>2</sup></span></div>',
+      `[ is ( A = lw ). Let ( l = 12 - w ) and plug into the area:
+
+\[
+A = (12 - w)w \quad \Rightarrow \quad A = 12w - w^2
+\]
+
+Now, we differentiate ( A ) with respect to ( w ):
+
+\[
+A'(w) = 12 - 2w
+\]
+
+We wish to maximize ( A ), so we set ( A'(w) = 0 ), and solve for ( w ):
+
+\[
+12 - 2w = 0 \quad \Rightarrow \quad w = 6
+\]
+
+Since ( l = 12 - w ), we have that ( l = 12 - 6 = 6 ). Therefore, the area of the rectangle is
+
+\[
+A = lw = 6 \cdot 6 = \boxed{36}
+\]
+]`,
     colorClass: 'step-color-objective'
-  },
-  {
-    id: 'derivative',
-    html: 'Now, we differentiate <span class="math-symbol">A</span> with respect to <span class="math-symbol">w</span>:',
-    colorClass: 'step-color-derivative'
-  },
-  {
-    id: 'mathDerivative',
-    html: '<div class="math-line"><span class="math-symbol">A&#39;(w) = 12 - 2w</span></div>',
-    colorClass: 'step-color-derivative'
-  },
-  {
-    id: 'solveDerivative',
-    html: 'Set <span class="math-symbol">A&#39;(w) = 0</span> to locate the critical point:',
-    colorClass: 'step-color-derivative'
-  },
-  {
-    id: 'mathSolve',
-    html: '<div class="math-line"><span class="math-symbol">12 - 2w = 0 ⇒ w = 6</span></div>',
-    colorClass: 'step-color-derivative'
-  },
-  {
-    id: 'conclusion',
-    html:
-      'Since <span class="math-symbol">l = 12 - w</span>, we obtain <span class="math-symbol">l = 6</span> and <span class="math-symbol">A = lw = 36</span>, so the maximum area is <span class="final-answer">36</span>.',
-    colorClass: 'step-color-conclusion'
   }
 ];
 
@@ -99,54 +109,56 @@ const frames = [
     stepStates: {}
   },
   {
-    status: { label: 'Committed first decomposition step', tone: 'commit' },
-    stepStates: { setup: 'new' }
+    status: { label: 'Proposing candidate prefix', tone: 'commit' },
+    stepStates: { introCombined: 'new' }
   },
   {
-    status: { label: 'Contracting to a shorter prefix', tone: 'contract' },
-    stepStates: { setup: 'contracting' }
+    status: { label: 'Re-scoring proposal…', tone: 'sampling' },
+    stepStates: { introCombined: 'visible' }
   },
   {
-    status: { label: 'Exploring a refined prefix', tone: 'sampling' },
-    stepStates: { setup: 'visible', constraint: 'new', bridge: 'new' }
+    status: { label: 'Contracting to shorter prefix', tone: 'contract' },
+    stepStates: { introCombined: 'contracting', setup: 'new' }
   },
   {
-    status: { label: 'Extending the derivation step', tone: 'commit' },
-    stepStates: {
-      setup: 'visible',
-      constraint: 'visible',
-      bridge: 'visible',
-      objective: 'new'
-    }
+    status: { label: 'Sampling on contracted prefix…', tone: 'sampling' },
+    stepStates: { setup: 'visible' }
   },
   {
-    status: { label: 'Pruning back to the hinge token', tone: 'contract' },
-    stepStates: {
-      setup: 'visible',
-      constraint: 'visible',
-      bridge: 'contracting'
-    }
+    status: { label: 'Committed partial proof', tone: 'commit' },
+    stepStates: { setup: 'visible' }
   },
   {
-    status: { label: 'Sampling again from the truncated prefix…', tone: 'sampling' },
-    stepStates: {
-      setup: 'visible',
-      constraint: 'visible'
-    }
+    status: { label: 'Proposing extended prefix', tone: 'commit' },
+    stepStates: { setup: 'visible', constraint: 'new' }
+  },
+  {
+    status: { label: 'Evaluating extension…', tone: 'sampling' },
+    stepStates: { setup: 'visible', constraint: 'visible' }
+  },
+  {
+    status: { label: 'Prefix accepted, continuing search', tone: 'commit' },
+    stepStates: { setup: 'visible', constraint: 'visible' }
+  },
+  {
+    status: { label: 'Deepening derivation…', tone: 'sampling' },
+    stepStates: { setup: 'visible', constraint: 'visible', whichBecause: 'new' }
+  },
+  {
+    status: { label: 'Pruning derivative clause', tone: 'contract' },
+    stepStates: { setup: 'visible', constraint: 'visible', whichBecause: 'contracting', which: 'new' }
+  },
+  {
+    status: { label: 'Rescoring hinge prefix…', tone: 'sampling' },
+    stepStates: { setup: 'visible', constraint: 'visible', which: 'visible' }
   },
   {
     status: { label: 'Verified optimal solution', tone: 'success' },
     stepStates: {
       setup: 'final',
       constraint: 'final',
-      bridge: 'final',
-      objective: 'final',
-      mathExpand: 'final',
-      derivative: 'final',
-      mathDerivative: 'final',
-      solveDerivative: 'final',
-      mathSolve: 'final',
-      conclusion: 'final'
+      whichFinal: 'final',
+      finalDerivation: 'final'
     }
   }
 ];
@@ -500,7 +512,8 @@ const frames = [
     transform: translateY(0);
     transition: opacity 0.45s ease, transform 0.45s ease, border-color 0.45s ease,
       background 0.45s ease;
-    max-height: 520px;
+    max-height: 920px;
+    white-space: pre-wrap;
     overflow: hidden;
   }
 
@@ -537,16 +550,6 @@ const frames = [
     box-shadow: 0 10px 28px rgba(42, 47, 108, 0.18);
     background: rgba(255, 255, 255, 0.95);
     color: var(--step-color);
-  }
-
-  .solution-step .math-line {
-    background: rgba(255, 255, 255, 0.78);
-    border-radius: 10px;
-    padding: 0.55rem 0.85rem;
-    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, 'Liberation Mono',
-      'Courier New', monospace;
-    margin: 0.55rem 0 0 0;
-    color: inherit;
   }
 
   .solution-footer {

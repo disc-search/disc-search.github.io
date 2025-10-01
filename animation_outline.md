@@ -1,6 +1,5 @@
 
 ---
-# Frame 1
 
 ### Problem
 A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
@@ -10,7 +9,15 @@ A rectangle has a perimeter of 24 inches. What is the maximum possible area of t
 
 ---
 
-# Frame 2
+### Problem
+A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
+
+### Solution
+{Proposed candidate prefix animation}
+[Let the length of the rectangle be ( l ), width be ( w ). We want to maximize the area ( A = lw ) subject to the constraint ( 2l + 2w = 24 ).]
+
+
+---
 
 ### Problem
 A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
@@ -21,18 +28,42 @@ A rectangle has a perimeter of 24 inches. What is the maximum possible area of t
 
 ---
 
-# Frame 3
+### Problem
+A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
+
+### Solution
+[Let the length of the rectangle be ( l )]
+{animate deleting characters until this point, e.g. contracting the candidate prefix}
+
+---
 
 ### Problem
 A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
 
 ### Solution
 [Let the length of the rectangle be ( l )]
-{animate deleting characters until this point}
+{shimmering sampling icon}
 
 ---
 
-# Frame 4
+### Problem
+A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
+
+### Solution
+{candidate prefix accepted and committed icon}
+[Let the length of the rectangle be ( l )]
+
+---
+
+### Problem
+A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
+
+### Solution
+{New proposed candidate prefix animation}
+[Let the length of the rectangle be ( l )] [ and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, ]
+
+
+---
 
 ### Problem
 A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
@@ -43,7 +74,26 @@ A rectangle has a perimeter of 24 inches. What is the maximum possible area of t
 
 ---
 
-# Frame 5
+### Problem
+A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
+
+### Solution
+{candidate prefix accepted and committed animation}
+[Let the length of the rectangle be ( l )] [ and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, ]
+{shimmering sampling icon}
+
+---
+
+### Problem
+A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
+
+### Solution
+{New proposed candidate prefix animation}
+[Let the length of the rectangle be ( l )] [ and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, ]
+[ which because of the constraint can be expressed as ( A = lw = l(12 - l) = 12l - l^2 ). To find the maximum area, we take the derivative of ( A ) with respect to ( l ) and set it to zero:]
+
+
+---
 
 ### Problem
 A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
@@ -55,8 +105,6 @@ A rectangle has a perimeter of 24 inches. What is the maximum possible area of t
 
 ---
 
-# Frame 6
-
 ### Problem
 A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
 
@@ -67,8 +115,6 @@ A rectangle has a perimeter of 24 inches. What is the maximum possible area of t
 
 ---
 
-# Frame 7
-
 ### Problem
 A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
 
@@ -78,8 +124,6 @@ A rectangle has a perimeter of 24 inches. What is the maximum possible area of t
 {shimmering sampling icon}
 
 ---
-
-# Frame 8
 
 ### Problem
 A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
