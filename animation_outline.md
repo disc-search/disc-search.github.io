@@ -1,177 +1,215 @@
-Possible animations:
-- Sampling animation: shimmering effect on the sampling icon while the model "thinks".
-- Proposed candidate prefix animation: text being typed out as an uncommitted proposal.
-- Contraction animation: deleting characters from the latest proposed text back to a prior prefix.
-- Candidate prefix accepted and committed animation: newly approved text becomes bold and receives a brief shimmer.
-- Correct solution has been found animation: the full solution shimmers to signal completion.
+# Clean Animation Outline (Full Text per Frame)
+
+### Frame 1 – Sampling
+
+**Animation:** Sampling (shimmering icon)
+**Action:** Model is “thinking.”
+**Visible Text:**
+
+```
+Problem: A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
+
+Solution:
+[[{shimmering sampling icon}]]
+```
 
 ---
 
-### Frame 1 - Initial sampling
-**Problem** A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
+### Frame 2 – Proposed Candidate Prefix
 
-**Solution view**
-- Committed text: *(none yet)*
-- Proposed text: *(none yet)*
+**Animation:** Typing-out text
+**Action:** Generate first candidate.
+**Visible Text:**
 
-**Animations**
-- Sampling animation - shimmering sampling icon.
-
----
-
-### Frame 2 - First proposal appears
-**Problem** Same as Frame 1.
-
-**Solution view**
-- Committed text: *(none yet)*
-- Proposed text: "Let the length of the rectangle be ( l ), width be ( w ). We want to maximize the area ( A = lw ) subject to the constraint ( 2l + 2w = 24 )."
-
-**Animations**
-- Proposed candidate prefix animation - the text above types on screen.
+```
+Solution:
+[[Let the length of the rectangle be (l), width be (w). We want to maximize the area (A = lw) subject to the constraint (2l + 2w = 24).]]
+```
 
 ---
 
-### Frame 3 - Sampling on proposed text
-**Problem** Same as Frame 1.
+### Frame 3 – Sampling
 
-**Solution view**
-- Committed text: *(none yet)*
-- Proposed text: "Let the length of the rectangle be ( l ), width be ( w ). We want to maximize the area ( A = lw ) subject to the constraint ( 2l + 2w = 24 )."
+**Animation:** Shimmering icon
+**Action:** Pause before continuing.
+**Visible Text:**
 
-**Animations**
-- Sampling animation - shimmering sampling icon while considering the proposal.
-
----
-
-### Frame 4 - Proposal contracts
-**Problem** Same as Frame 1.
-
-**Solution view**
-- Committed text: *(none yet)*
-- Proposed text: "Let the length of the rectangle be ( l )"
-
-**Animations**
-- Contraction animation - previously typed text deletes back to this prefix.
+```
+Solution:
+[Let the length of the rectangle be (l), width be (w). We want to maximize the area (A = lw) subject to the constraint (2l + 2w = 24).]
+[[{shimmering sampling icon}]]
+```
 
 ---
 
-### Frame 5 - Sampling after contraction
-**Problem** Same as Frame 1.
+### Frame 4 – Contraction
 
-**Solution view**
-- Committed text: *(none yet)*
-- Proposed text: "Let the length of the rectangle be ( l )"
+**Animation:** Deletion of candidate prefix
+**Action:** Backspace until only the first part remains.
+**Visible Text:**
 
-**Animations**
-- Sampling animation - shimmering sampling icon on the shorter proposal.
-
----
-
-### Frame 6 - Prefix accepted
-**Problem** Same as Frame 1.
-
-**Solution view**
-- Committed text: **"Let the length of the rectangle be ( l )"**
-- Proposed text: *(none)*
-
-**Animations**
-- Candidate prefix accepted and committed animation - accepted text bolds and shimmers briefly.
+```
+Solution:
+[[Let the length of the rectangle be (l)]]
+```
 
 ---
 
-### Frame 7 - New proposal extends solution
-**Problem** Same as Frame 1.
+### Frame 5 – Sampling
 
-**Solution view**
-- Committed text: **"Let the length of the rectangle be ( l )"**
-- Proposed text: " and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, "
+**Animation:** Shimmering
+**Action:** Pause again.
+**Visible Text:**
 
-**Animations**
-- Proposed candidate prefix animation - the new text types out after the committed prefix.
-
----
-
-### Frame 8 - Sampling on second proposal
-**Problem** Same as Frame 1.
-
-**Solution view**
-- Committed text: **"Let the length of the rectangle be ( l )"**
-- Proposed text: " and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, "
-
-**Animations**
-- Sampling animation - shimmering sampling icon while evaluating the extended proposal.
+```
+Solution:
+[Let the length of the rectangle be (l)]
+[[{shimmering sampling icon}]]
+```
 
 ---
 
-### Frame 9 - Second proposal accepted
-**Problem** Same as Frame 1.
+### Frame 6 – Candidate Accepted
 
-**Solution view**
-- Committed text: **"Let the length of the rectangle be ( l ) and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, "**
-- Proposed text: *(none)*
+**Animation:** Bold + shimmer
+**Action:** Commit prefix.
+**Visible Text:**
 
-**Animations**
-- Candidate prefix accepted and committed animation - the new paragraph bolds and shimmers.
-- Sampling animation - shimmering sampling icon after the acceptance.
-
----
-
-### Frame 10 - Third proposal introduces calculus step
-**Problem** Same as Frame 1.
-
-**Solution view**
-- Committed text: **"Let the length of the rectangle be ( l ) and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, "**
-- Proposed text: " which because of the constraint can be expressed as ( A = lw = l(12 - l) = 12l - l^2 ). To find the maximum area, we take the derivative of ( A ) with respect to ( l ) and set it to zero:"
-
-**Animations**
-- Proposed candidate prefix animation - new calculus-focused text types onto the screen.
+```
+Solution:
+{{Let the length of the rectangle be (l)}}
+```
 
 ---
 
-### Frame 11 - Sampling on calculus step
-**Problem** Same as Frame 1.
+### Frame 7 – Proposed Candidate Prefix
 
-**Solution view**
-- Committed text: **"Let the length of the rectangle be ( l ) and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, "**
-- Proposed text: " which because of the constraint can be expressed as ( A = lw = l(12 - l) = 12l - l^2 ). To find the maximum area, we take the derivative of ( A ) with respect to ( l ) and set it to zero:"
+**Animation:** Typing-out text
+**Action:** Add width and constraint.
+**Visible Text:**
 
-**Animations**
-- Sampling animation - shimmering sampling icon while evaluating the calculus proposal.
-
----
-
-### Frame 12 - Third proposal contracts
-**Problem** Same as Frame 1.
-
-**Solution view**
-- Committed text: **"Let the length of the rectangle be ( l ) and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, "**
-- Proposed text: " which"
-
-**Animations**
-- Contraction animation - deletes the calculus explanation back to the shorter prefix "which".
+```
+Solution:
+{{Let the length of the rectangle be (l)}} 
+[[and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,]]
+```
 
 ---
 
-### Frame 13 - Sampling on shortened prefix
-**Problem** Same as Frame 1.
+### Frame 8 – Sampling
 
-**Solution view**
-- Committed text: **"Let the length of the rectangle be ( l ) and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, "**
-- Proposed text: " which"
+**Animation:** Shimmering
+**Visible Text:**
 
-**Animations**
-- Sampling animation - shimmering sampling icon while reconsidering how to continue.
+```
+Solution:
+{{Let the length of the rectangle be (l)}} 
+[and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,]
+[[{shimmering sampling icon}]]
+```
 
 ---
 
-### Frame 14 - Final solution committed and celebrated
-**Problem** Same as Frame 1.
+### Frame 9 – Candidate Accepted + Sampling
 
-**Solution view**
-- Committed text: **"Let the length of the rectangle be ( l ) and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, which is ( A = lw ). Let ( l = 12 - w ) and plug into the area:  A = (12 - w)w  =>  A = 12w - w^2.  Now, we differentiate ( A ) with respect to ( w ):  A'(w) = 12 - 2w.  We wish to maximize ( A ), so we set ( A'(w) = 0 ), and solve for ( w ):  12 - 2w = 0  =>  w = 6.  Since ( l = 12 - w ), we have that ( l = 12 - 6 = 6 ). Therefore, the area of the rectangle is  A = lw = 6 \cdot 6 = \boxed{36}."**
-- Proposed text: *(none - full solution is locked in)*
+**Animation:** Commit + shimmer
+**Action:** Accept second prefix, then pause.
+**Visible Text:**
 
-**Animations**
-- Candidate prefix accepted and committed animation - final text locks in and shimmers.
-- Correct solution has been found animation - entire solution receives a celebratory shimmer.
+```
+Solution:
+{{Let the length of the rectangle be (l)}} 
+{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}}
+[[{shimmering sampling icon}]]
+```
+
 ---
+
+### Frame 10 – Proposed Candidate Prefix
+
+**Animation:** Typing-out text
+**Action:** Add expression for A and derivative step.
+**Visible Text:**
+
+```
+Solution:
+{{Let the length of the rectangle be (l)}} 
+{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}} 
+[[which because of the constraint can be expressed as (A = lw = l(12 - l) = 12l - l^2). To find the maximum area, we take the derivative of (A) with respect to (l) and set it to zero:]]
+```
+
+---
+
+### Frame 11 – Sampling
+
+**Animation:** Shimmering
+**Visible Text:**
+
+```
+Solution:
+{{Let the length of the rectangle be (l)}} 
+{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}} 
+[which because of the constraint can be expressed as (A = lw = l(12 - l) = 12l - l^2). To find the maximum area, we take the derivative of (A) with respect to (l) and set it to zero:]
+[[{shimmering sampling icon}]]
+```
+
+---
+
+### Frame 12 – Contraction
+
+**Animation:** Deletion
+**Action:** Shrink back to only “which.”
+**Visible Text:**
+
+```
+Solution:
+{{Let the length of the rectangle be (l)}} 
+{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}} 
+[[which]]
+```
+
+---
+
+### Frame 13 – Sampling
+
+**Animation:** Shimmering
+**Visible Text:**
+
+```
+Solution:
+{{Let the length of the rectangle be (l)}} 
+{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}} 
+[which]
+[[{shimmering sampling icon}]]
+```
+
+---
+
+### Frame 14 – Candidate Accepted + Correct Solution Found
+
+**Animation:** Commit prefixes + shimmer entire solution
+**Action:** Accept full reasoning and reveal final result.
+**Visible Text:**
+
+```
+Solution:
+{{Let the length of the rectangle be (l)}} 
+{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}} 
+{{which}} 
+is (A = lw). Let (l = 12 - w) and plug into the area:
+
+A = (12 - w)w  ⇒  A = 12w - w^2
+
+Differentiate: A'(w) = 12 - 2w
+
+Set derivative = 0 ⇒ w = 6
+
+Then l = 6. Therefore, the maximum area is
+
+A = lw = 6 × 6 = **36**
+```
+
+**Final Animation:** Entire solution shimmers (correct solution found).
+
+---
+
