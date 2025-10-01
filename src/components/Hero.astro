@@ -64,7 +64,7 @@
         </svg>
         <span>Paper</span>
       </a>
-      <a href="/teaser.pdf" class="resource-button">
+      <a href="/diagrams/teaser.svg" class="resource-button">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="resource-icon" aria-hidden="true">
           <path d="M12 20l9-7-9-7-9 7 9 7z"></path>
           <line x1="12" y1="13" x2="12" y2="20"></line>
@@ -75,12 +75,12 @@
   </div>
 
   <div class="diagram-placeholder">
-    <iframe
-      src="/teaser.pdf#toolbar=0&navpanes=0&scrollbar=0"
-      title="DISC teaser diagram"
-      class="diagram-doc"
+    <img
+      src="/diagrams/teaser.svg"
+      alt="DISC teaser diagram showing dynamic decomposition workflow"
+      class="diagram-image"
       loading="lazy"
-    ></iframe>
+    />
   </div>
 
   <div class="authors-section">
@@ -190,12 +190,12 @@
     line-height: 1.6;
   }
 
-  .diagram-doc {
+  .diagram-image {
     width: min(100%, 900px);
-    height: 540px;
-    border: none;
+    height: auto;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    display: block;
   }
 
   .affiliations {
@@ -210,8 +210,5 @@
       grid-template-columns: repeat(1, minmax(0, 1fr));
     }
 
-    .diagram-doc {
-      height: 420px;
-    }
   }
 </style>
