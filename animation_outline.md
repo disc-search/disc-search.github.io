@@ -91,27 +91,27 @@ A rectangle has a perimeter of 24 inches. What is the maximum possible area of t
 **[ which ]**
 [ is ( A = lw ). Let ( l = 12 - w ) and plug into the area:
 
-[
+\[
 A = (12 - w)w \quad \Rightarrow \quad A = 12w - w^2
-]
+\]
 
 Now, we differentiate ( A ) with respect to ( w ):
 
-[
+\[
 A'(w) = 12 - 2w
-]
+\]
 
 We wish to maximize ( A ), so we set ( A'(w) = 0 ), and solve for ( w ):
 
-[
+\[
 12 - 2w = 0 \quad \Rightarrow \quad w = 6
-]
+\]
 
 Since ( l = 12 - w ), we have that ( l = 12 - 6 = 6 ). Therefore, the area of the rectangle is
 
-[
+\[
 A = lw = 6 \cdot 6 = \boxed{36}
-]
+\]
 ]
 
 {correct solution has been found animation}

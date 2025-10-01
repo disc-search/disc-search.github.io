@@ -37,6 +37,119 @@ const highlights = [
     text: 'Under mild support assumptions on the base policy, DISC monotonically improves the best solution prefix.'
   } 
 ];
+
+const stepDefinitions = [
+  {
+    id: 'setup',
+    html: `[ Let the length of the rectangle be <span class="math-symbol">l</span> ]`,
+    colorClass: 'step-color-setup'
+  },
+  {
+    id: 'constraint',
+    html: `[ and the width of the rectangle be <span class="math-symbol">w</span>. Since the perimeter of the rectangle is 24 inches, we have that <span class="math-symbol">2l + 2w = 24</span>, so <span class="math-symbol">l + w = 12</span>. We wish to maximize the area of the rectangle, ]`,
+    colorClass: 'step-color-constraint'
+  },
+  {
+    id: 'bridge',
+    html: `[ which ]`,
+    colorClass: 'step-color-bridge'
+  },
+  {
+    id: 'objective',
+    html: `[ is <span class="math-symbol">A = lw</span>. Let <span class="math-symbol">l = 12 - w</span> and plug into the area: ]`,
+    colorClass: 'step-color-objective'
+  },
+  {
+    id: 'mathExpand',
+    html:
+      '<div class="math-line"><span class="math-symbol">A = (12 - w)w ⇒ A = 12w - w<sup>2</sup></span></div>',
+    colorClass: 'step-color-objective'
+  },
+  {
+    id: 'derivative',
+    html: 'Now, we differentiate <span class="math-symbol">A</span> with respect to <span class="math-symbol">w</span>:',
+    colorClass: 'step-color-derivative'
+  },
+  {
+    id: 'mathDerivative',
+    html: '<div class="math-line"><span class="math-symbol">A&#39;(w) = 12 - 2w</span></div>',
+    colorClass: 'step-color-derivative'
+  },
+  {
+    id: 'solveDerivative',
+    html: 'Set <span class="math-symbol">A&#39;(w) = 0</span> to locate the critical point:',
+    colorClass: 'step-color-derivative'
+  },
+  {
+    id: 'mathSolve',
+    html: '<div class="math-line"><span class="math-symbol">12 - 2w = 0 ⇒ w = 6</span></div>',
+    colorClass: 'step-color-derivative'
+  },
+  {
+    id: 'conclusion',
+    html:
+      'Since <span class="math-symbol">l = 12 - w</span>, we obtain <span class="math-symbol">l = 6</span> and <span class="math-symbol">A = lw = 36</span>, so the maximum area is <span class="final-answer">36</span>.',
+    colorClass: 'step-color-conclusion'
+  }
+];
+
+const frames = [
+  {
+    status: { label: 'Sampling new prefixes…', tone: 'sampling' },
+    stepStates: {}
+  },
+  {
+    status: { label: 'Committed first decomposition step', tone: 'commit' },
+    stepStates: { setup: 'new' }
+  },
+  {
+    status: { label: 'Contracting to a shorter prefix', tone: 'contract' },
+    stepStates: { setup: 'contracting' }
+  },
+  {
+    status: { label: 'Exploring a refined prefix', tone: 'sampling' },
+    stepStates: { setup: 'visible', constraint: 'new', bridge: 'new' }
+  },
+  {
+    status: { label: 'Extending the derivation step', tone: 'commit' },
+    stepStates: {
+      setup: 'visible',
+      constraint: 'visible',
+      bridge: 'visible',
+      objective: 'new'
+    }
+  },
+  {
+    status: { label: 'Pruning back to the hinge token', tone: 'contract' },
+    stepStates: {
+      setup: 'visible',
+      constraint: 'visible',
+      bridge: 'contracting'
+    }
+  },
+  {
+    status: { label: 'Sampling again from the truncated prefix…', tone: 'sampling' },
+    stepStates: {
+      setup: 'visible',
+      constraint: 'visible'
+    }
+  },
+  {
+    status: { label: 'Verified optimal solution', tone: 'success' },
+    stepStates: {
+      setup: 'final',
+      constraint: 'final',
+      bridge: 'final',
+      objective: 'final',
+      mathExpand: 'final',
+      derivative: 'final',
+      mathDerivative: 'final',
+      solveDerivative: 'final',
+      mathSolve: 'final',
+      conclusion: 'final'
+    }
+  }
+];
 ---
 <section id="workflow" class="content-section alt-background">
   <div class="section-container">
@@ -49,32 +162,52 @@ const highlights = [
 
     <div class="decomposition-card" aria-labelledby="decomposition-title">
       <div class="decomposition-title" id="decomposition-title">\decomp example decomposition</div>
-      <div class="decomposition-body">
-        <p>
-          <span class="tone-high">[ Let the length of the rectangle be <span class="math-symbol">l</span> ]</span>
-          <span class="tone-medium">
-            [ and the width of the rectangle be <span class="math-symbol">w</span>. Since the perimeter of the rectangle is 24 inches,
-            we have that <span class="math-symbol">2l + 2w = 24</span>, so <span class="math-symbol">l + w = 12</span>. We wish to maximize the area of the
-            rectangle, ]
-          </span>
-          <span class="tone-high">[ which ]</span>
-        </p>
-        <p class="tone-low">[ is <span class="math-symbol">A = lw</span>. Let <span class="math-symbol">l = 12 - w</span> and plug into the area: ]</p>
-        <div class="math-line tone-low">
-          <span class="math-symbol">A = (12 - w)w ⇒ A = 12w - w<sup>2</sup></span>
+      <div
+        class="decomposition-body"
+        data-decomposition
+        data-frames={JSON.stringify(frames)}
+      >
+        <div class="decomposition-columns">
+          <div class="problem-panel">
+            <h3>Problem</h3>
+            <p>A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</p>
+          </div>
+          <div class="solution-panel">
+            <div class="solution-header">
+              <div>
+                <h3>Dynamic decomposition</h3>
+                <p>The algorithm expands, contracts, and replays prefixes until it stabilizes on a proof-quality answer.</p>
+              </div>
+              <div
+                class="status-pill"
+                data-status-pill
+                data-status={frames[0].status.tone}
+              >
+                <span class="status-icon" data-status-dot></span>
+                <span data-status-text>{frames[0].status.label}</span>
+              </div>
+            </div>
+            <div class="solution-steps" data-step-container>
+              {stepDefinitions.map((step) => {
+                const initialState = frames[0].stepStates[step.id] ?? 'hidden';
+                return (
+                  <div
+                    class={`solution-step ${step.colorClass}`}
+                    data-step-id={step.id}
+                    data-state={initialState}
+                    aria-hidden={initialState === 'hidden' ? 'true' : 'false'}
+                    set:html={step.html}
+                  />
+                );
+              })}
+            </div>
+            <div class="solution-footer">
+              <span class="frame-indicator" data-frame-indicator>
+                Frame 1 / {frames.length}
+              </span>
+            </div>
+          </div>
         </div>
-        <p class="tone-low">Now, we differentiate <span class="math-symbol">A</span> with respect to <span class="math-symbol">w</span>:</p>
-        <div class="math-line tone-low">
-          <span class="math-symbol">A'(w) = 12 - 2w</span>
-        </div>
-        <p class="tone-low">We wish to maximize <span class="math-symbol">A</span>, so we set <span class="math-symbol">A'(w) = 0</span>, and solve for <span class="math-symbol">w</span>:</p>
-        <div class="math-line tone-low">
-          <span class="math-symbol">12 - 2w = 0 ⇒ w = 6</span>
-        </div>
-        <p class="tone-low">
-          Since <span class="math-symbol">l = 12 - w</span>, we have that <span class="math-symbol">l = 12 - 6 = 6</span>. Therefore, the area of the rectangle is
-          <span class="math-symbol">A = lw = 6 · 6 = </span><span class="final-answer">36</span>.
-        </p>
       </div>
     </div>
 
@@ -121,6 +254,90 @@ const highlights = [
   </div>
 </section>
 
+<script is:inline>
+  (() => {
+    const root = document.querySelector('[data-decomposition]');
+    if (!root) return;
+
+    const rawFrames = root.dataset.frames;
+    if (!rawFrames) return;
+
+    let frames;
+    try {
+      frames = JSON.parse(rawFrames);
+    } catch (error) {
+      console.warn('Unable to parse decomposition frames', error);
+      return;
+    }
+
+    if (!Array.isArray(frames) || frames.length === 0) {
+      return;
+    }
+
+    const totalFrames = frames.length;
+    const steps = Array.from(root.querySelectorAll('[data-step-id]'));
+    const statusPill = root.querySelector('[data-status-pill]');
+    const statusText = root.querySelector('[data-status-text]');
+    const frameIndicator = root.querySelector('[data-frame-indicator]');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const applyFrame = (index) => {
+      const frame = frames[index];
+      if (!frame) return;
+
+      steps.forEach((stepEl) => {
+        const state = frame.stepStates[stepEl.dataset.stepId] ?? 'hidden';
+        stepEl.dataset.state = state;
+        stepEl.setAttribute('aria-hidden', state === 'hidden' ? 'true' : 'false');
+      });
+
+      if (statusPill) {
+        statusPill.dataset.status = frame.status?.tone ?? 'sampling';
+      }
+
+      if (statusText && frame.status?.label) {
+        statusText.textContent = frame.status.label;
+      }
+
+      if (frameIndicator) {
+        frameIndicator.textContent = `Frame ${index + 1} / ${totalFrames}`;
+      }
+    };
+
+    let frameIndex = 0;
+    applyFrame(frameIndex);
+
+    if (prefersReducedMotion.matches) {
+      applyFrame(totalFrames - 1);
+      return;
+    }
+
+    const advance = () => {
+      frameIndex = (frameIndex + 1) % totalFrames;
+      applyFrame(frameIndex);
+    };
+
+    let intervalId = window.setInterval(advance, 3600);
+
+    const onPrefersMotionChange = (event) => {
+      if (event.matches) {
+        window.clearInterval(intervalId);
+        applyFrame(totalFrames - 1);
+      } else {
+        frameIndex = frameIndex % totalFrames;
+        applyFrame(frameIndex);
+        intervalId = window.setInterval(advance, 3600);
+      }
+    };
+
+    if (typeof prefersReducedMotion.addEventListener === 'function') {
+      prefersReducedMotion.addEventListener('change', onPrefersMotionChange);
+    } else if (typeof prefersReducedMotion.addListener === 'function') {
+      prefersReducedMotion.addListener(onPrefersMotionChange);
+    }
+  })();
+</script>
+
 <style>
   #workflow .section-description {
     max-width: 780px;
@@ -147,34 +364,202 @@ const highlights = [
   }
 
   .decomposition-body {
-    display: grid;
-    gap: 0.9rem;
-    color: #3f4455;
+    color: #2e3647;
   }
 
-  .decomposition-body p {
+  .decomposition-columns {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .problem-panel {
+    background: linear-gradient(135deg, rgba(42, 47, 108, 0.08), rgba(42, 47, 108, 0.02));
+    border-radius: 16px;
+    padding: 1.2rem 1.4rem;
+    color: #232b45;
+  }
+
+  .problem-panel h3 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: #2a2f6c;
+  }
+
+  .problem-panel p {
     margin: 0;
     line-height: 1.6;
   }
 
-  .math-line {
-    background: rgba(42, 47, 108, 0.05);
-    border-radius: 10px;
-    padding: 0.6rem 0.9rem;
-    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  .solution-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
   }
 
-  .tone-high {
+  .solution-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .solution-header h3 {
+    margin: 0 0 0.3rem 0;
     color: #2a2f6c;
+  }
+
+  .solution-header p {
+    margin: 0;
+    max-width: 400px;
+    line-height: 1.5;
+    color: #4a4f63;
+    font-size: 0.95rem;
+  }
+
+  .status-pill {
+    --pill-color: #2a2f6c;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
     font-weight: 600;
+    background: rgba(42, 47, 108, 0.1);
+    color: #2a2f6c;
+    white-space: nowrap;
   }
 
-  .tone-medium {
-    color: #50578c;
+  .status-icon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--pill-color);
+    position: relative;
+    overflow: hidden;
   }
 
-  .tone-low {
-    color: #3f4455;
+  .status-icon::after {
+    content: '';
+    position: absolute;
+    inset: -60%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+    transform: rotate(15deg) translateX(-120%);
+    opacity: 0;
+  }
+
+  .status-pill[data-status='sampling'] {
+    --pill-color: #5b60ff;
+    background: rgba(91, 96, 255, 0.12);
+    color: #2d36d1;
+  }
+
+  .status-pill[data-status='sampling'] .status-icon::after {
+    animation: statusShimmer 1.6s infinite;
+    opacity: 1;
+  }
+
+  .status-pill[data-status='contract'] {
+    --pill-color: #d97706;
+    background: rgba(217, 119, 6, 0.12);
+    color: #ad5b04;
+  }
+
+  .status-pill[data-status='commit'] {
+    --pill-color: #2563eb;
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
+  }
+
+  .status-pill[data-status='success'] {
+    --pill-color: #2f7a36;
+    background: rgba(47, 122, 54, 0.12);
+    color: #27632c;
+  }
+
+  .solution-steps {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .solution-step {
+    --step-color: #2a2f6c;
+    position: relative;
+    margin: 0.3rem 0;
+    padding: 0.75rem 1rem;
+    border-radius: 14px;
+    border-left: 4px solid transparent;
+    background: rgba(42, 47, 108, 0.05);
+    color: var(--step-color);
+    line-height: 1.6;
+    font-size: 0.98rem;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.45s ease, transform 0.45s ease, border-color 0.45s ease,
+      background 0.45s ease;
+    max-height: 520px;
+    overflow: hidden;
+  }
+
+  .solution-step[data-state='hidden'] {
+    opacity: 0;
+    transform: translateY(12px);
+    max-height: 0;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-left-color: transparent;
+    background: transparent;
+  }
+
+  .solution-step[data-state='visible'],
+  .solution-step[data-state='new'],
+  .solution-step[data-state='contracting'],
+  .solution-step[data-state='final'] {
+    border-left-color: var(--step-color);
+  }
+
+  .solution-step[data-state='new'] {
+    animation: stepReveal 0.8s ease;
+    background: rgba(42, 47, 108, 0.09);
+  }
+
+  .solution-step[data-state='contracting'] {
+    animation: stepContract 0.8s ease;
+    opacity: 0.6;
+    background: rgba(42, 47, 108, 0.03);
+  }
+
+  .solution-step[data-state='final'] {
+    box-shadow: 0 10px 28px rgba(42, 47, 108, 0.18);
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--step-color);
+  }
+
+  .solution-step .math-line {
+    background: rgba(255, 255, 255, 0.78);
+    border-radius: 10px;
+    padding: 0.55rem 0.85rem;
+    font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+    margin: 0.55rem 0 0 0;
+    color: inherit;
+  }
+
+  .solution-footer {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 0.85rem;
+    color: #556078;
+  }
+
+  .frame-indicator {
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(42, 47, 108, 0.08);
   }
 
   .math-symbol {
@@ -190,6 +575,62 @@ const highlights = [
     background: rgba(42, 47, 108, 0.12);
     font-weight: 700;
     color: #2a2f6c;
+  }
+
+  .step-color-setup {
+    --step-color: #2a2f6c;
+  }
+
+  .step-color-constraint {
+    --step-color: #5b4ef2;
+  }
+
+  .step-color-bridge {
+    --step-color: #009688;
+  }
+
+  .step-color-objective {
+    --step-color: #d97706;
+  }
+
+  .step-color-derivative {
+    --step-color: #ec4899;
+  }
+
+  .step-color-conclusion {
+    --step-color: #2e7d32;
+  }
+
+  @keyframes stepReveal {
+    0% {
+      box-shadow: 0 0 0 rgba(42, 47, 108, 0);
+    }
+    50% {
+      box-shadow: 0 10px 24px rgba(42, 47, 108, 0.24);
+    }
+    100% {
+      box-shadow: 0 0 0 rgba(42, 47, 108, 0);
+    }
+  }
+
+  @keyframes stepContract {
+    0% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(8px);
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes statusShimmer {
+    0% {
+      transform: rotate(15deg) translateX(-120%);
+    }
+    100% {
+      transform: rotate(15deg) translateX(120%);
+    }
   }
 
   .workflow-grid {
@@ -280,6 +721,17 @@ const highlights = [
     color: rgba(255, 255, 255, 0.85);
   }
 
+  @media (min-width: 900px) {
+    .decomposition-columns {
+      grid-template-columns: 0.94fr 1.1fr;
+      align-items: stretch;
+    }
+
+    .solution-panel {
+      padding-left: 0.5rem;
+    }
+  }
+
   @media (max-width: 900px) {
     .workflow-grid {
       grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -288,6 +740,10 @@ const highlights = [
     .decomposition-card {
       padding: 1.5rem;
       margin-bottom: 2.5rem;
+    }
+
+    .status-pill {
+      white-space: normal;
     }
 
     .highlight-banner {
