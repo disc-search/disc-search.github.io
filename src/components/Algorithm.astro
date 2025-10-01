@@ -40,132 +40,148 @@ const highlights = [
 
 const stepDefinitions = [
   {
-    id: 'introCombined',
-    html:
-      `[Let the length of the rectangle be ( l ), width be ( w ). We want to maximize the area ( A = lw ) subject to the constraint ( 2l + 2w = 24 ).]`,
-    colorClass: 'step-color-setup'
+    id: 'solutionLabel',
+    html: `<span class="step-text">Solution:</span>`,
+    colorClass: 'step-color-label'
   },
   {
-    id: 'setup',
-    html: `[ Let the length of the rectangle be ( l ) ]`,
-    colorClass: 'step-color-setup'
+    id: 'sampling',
+    html: `<div class="sampling-icon" role="img" aria-label="Sampling candidate completions">
+  <span class="spark"></span>
+  <span class="spark"></span>
+  <span class="spark"></span>
+</div>`,
+    colorClass: 'step-color-sampling sampling-step'
+  },
+  {
+    id: 'initialCandidate',
+    html:
+      `<span class="step-text">Let the length of the rectangle be ( l ), width be ( w ). We want to maximize the area ( A = lw ) subject to the constraint ( 2l + 2w = 24 ).</span>`,
+    colorClass: 'step-color-setup bracketed-step'
+  },
+  {
+    id: 'coreSetup',
+    html: `<span class="step-text">Let the length of the rectangle be ( l )</span>`,
+    colorClass: 'step-color-setup bracketed-step'
   },
   {
     id: 'constraint',
     html:
-      `[ and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle, ]`,
-    colorClass: 'step-color-constraint'
+      `<span class="step-text">and the width of the rectangle be ( w ). Since the perimeter of the rectangle is 24 inches, we have that ( 2l + 2w = 24 ), so ( l + w = 12 ). We wish to maximize the area of the rectangle,</span>`,
+    colorClass: 'step-color-constraint bracketed-step'
   },
   {
-    id: 'whichBecause',
+    id: 'whichClause',
     html:
-      `[ which because of the constraint can be expressed as ( A = lw = l(12 - l) = 12l - l^2 ). To find the maximum area, we take the derivative of ( A ) with respect to ( l ) and set it to zero:]`,
-    colorClass: 'step-color-derivative'
+      `<span class="step-text">which because of the constraint can be expressed as ( A = lw = l(12 - l) = 12l - l^2 ). To find the maximum area, we take the derivative of ( A ) with respect to ( l ) and set it to zero:</span>`,
+    colorClass: 'step-color-derivative bracketed-step'
   },
   {
-    id: 'which',
-    html: `[ which]`,
-    colorClass: 'step-color-bridge'
-  },
-  {
-    id: 'whichFinal',
-    html: `[ which ]`,
-    colorClass: 'step-color-bridge'
+    id: 'whichOnly',
+    html: `<span class="step-text">which</span>`,
+    colorClass: 'step-color-bridge bracketed-step'
   },
   {
     id: 'finalDerivation',
-    html:
-      `[ is ( A = lw ). Let ( l = 12 - w ) and plug into the area:
-
-\[
-A = (12 - w)w \quad \Rightarrow \quad A = 12w - w^2
-\]
-
-Now, we differentiate ( A ) with respect to ( w ):
-
-\[
-A'(w) = 12 - 2w
-\]
-
-We wish to maximize ( A ), so we set ( A'(w) = 0 ), and solve for ( w ):
-
-\[
-12 - 2w = 0 \quad \Rightarrow \quad w = 6
-\]
-
-Since ( l = 12 - w ), we have that ( l = 12 - 6 = 6 ). Therefore, the area of the rectangle is
-
-\[
-A = lw = 6 \cdot 6 = \boxed{36}
-\]
-]`,
-    colorClass: 'step-color-objective'
+    html: `<div class="final-derivation-text">
+is ( A = lw ). Let ( l = 12 - w ) and plug into the area:<br /><br />
+A = ( 12 - w )w  =>  A = 12w - w^2<br /><br />
+Differentiate: A'( w ) = 12 - 2w<br /><br />
+Set derivative = 0 => w = 6<br /><br />
+Then l = 6. Therefore, the maximum area is<br /><br />
+A = lw = 6 &times; 6 = <strong>36</strong>
+</div>`,
+    colorClass: 'step-color-objective final-derivation-step'
   }
 ];
 
 const frames = [
   {
-    status: { label: 'Sampling new prefixes…', tone: 'sampling' },
-    stepStates: {}
+    status: { label: 'Sampling initial prefix…', tone: 'sampling' },
+    stepStates: { solutionLabel: 'visible', sampling: 'sampling' }
   },
   {
     status: { label: 'Proposing candidate prefix', tone: 'commit' },
-    stepStates: { introCombined: 'new' }
+    stepStates: { solutionLabel: 'visible', initialCandidate: 'new' }
   },
   {
-    status: { label: 'Re-scoring proposal…', tone: 'sampling' },
-    stepStates: { introCombined: 'visible' }
+    status: { label: 'Evaluating proposal…', tone: 'sampling' },
+    stepStates: { solutionLabel: 'visible', initialCandidate: 'visible', sampling: 'sampling' }
   },
   {
     status: { label: 'Contracting to core prefix', tone: 'contract' },
-    stepStates: { introCombined: 'contracting', setup: 'new' }
+    stepStates: {
+      solutionLabel: 'visible',
+      initialCandidate: 'contracting',
+      coreSetup: 'new'
+    }
   },
   {
-    status: { label: 'Sampling on contracted prefix…', tone: 'sampling' },
-    stepStates: { setup: 'visible' }
+    status: { label: 'Sampling contracted prefix…', tone: 'sampling' },
+    stepStates: { solutionLabel: 'visible', coreSetup: 'visible', sampling: 'sampling' }
   },
   {
-    status: { label: 'Committed partial proof', tone: 'commit' },
-    stepStates: { setup: 'visible' }
+    status: { label: 'Candidate accepted', tone: 'commit' },
+    stepStates: { solutionLabel: 'visible', coreSetup: 'final' }
   },
   {
     status: { label: 'Proposing extended prefix', tone: 'commit' },
-    stepStates: { setup: 'visible', constraint: 'new' }
+    stepStates: { solutionLabel: 'visible', coreSetup: 'final', constraint: 'new' }
   },
   {
     status: { label: 'Evaluating extension…', tone: 'sampling' },
-    stepStates: { setup: 'visible', constraint: 'visible' }
+    stepStates: {
+      solutionLabel: 'visible',
+      coreSetup: 'final',
+      constraint: 'visible',
+      sampling: 'sampling'
+    }
   },
   {
-    status: { label: 'Prefix accepted, continuing search', tone: 'commit' },
-    stepStates: { setup: 'visible', constraint: 'visible' }
+    status: { label: 'Prefix accepted, sampling ahead', tone: 'commit' },
+    stepStates: { solutionLabel: 'visible', coreSetup: 'final', constraint: 'final', sampling: 'sampling' }
   },
   {
-    status: { label: 'Sampling refinements…', tone: 'sampling' },
-    stepStates: { setup: 'visible', constraint: 'visible' }
+    status: { label: 'Drafting derivative clause…', tone: 'commit' },
+    stepStates: { solutionLabel: 'visible', coreSetup: 'final', constraint: 'final', whichClause: 'new' }
   },
   {
-    status: { label: 'Deepening derivation…', tone: 'commit' },
-    stepStates: { setup: 'visible', constraint: 'visible', whichBecause: 'new' }
+    status: { label: 'Scoring derivative clause…', tone: 'sampling' },
+    stepStates: {
+      solutionLabel: 'visible',
+      coreSetup: 'final',
+      constraint: 'final',
+      whichClause: 'visible',
+      sampling: 'sampling'
+    }
   },
   {
-    status: { label: 'Re-scoring derivative clause…', tone: 'sampling' },
-    stepStates: { setup: 'visible', constraint: 'visible', whichBecause: 'visible' }
-  },
-  {
-    status: { label: 'Pruning derivative clause', tone: 'contract' },
-    stepStates: { setup: 'visible', constraint: 'visible', whichBecause: 'contracting', which: 'new' }
+    status: { label: 'Contracting derivative clause', tone: 'contract' },
+    stepStates: {
+      solutionLabel: 'visible',
+      coreSetup: 'final',
+      constraint: 'final',
+      whichClause: 'contracting',
+      whichOnly: 'new'
+    }
   },
   {
     status: { label: 'Sampling hinge prefix…', tone: 'sampling' },
-    stepStates: { setup: 'visible', constraint: 'visible', which: 'visible' }
+    stepStates: {
+      solutionLabel: 'visible',
+      coreSetup: 'final',
+      constraint: 'final',
+      whichOnly: 'visible',
+      sampling: 'sampling'
+    }
   },
   {
     status: { label: 'Correct solution found', tone: 'success' },
     stepStates: {
-      setup: 'final',
+      solutionLabel: 'visible',
+      coreSetup: 'final',
       constraint: 'final',
-      whichFinal: 'final',
+      whichOnly: 'final',
       finalDerivation: 'final'
     }
   }
@@ -322,6 +338,8 @@ const frames = [
       if (frameIndicator) {
         frameIndicator.textContent = `Frame ${index + 1} / ${totalFrames}`;
       }
+
+      root.dataset.activeTone = frame.status?.tone ?? '';
     };
 
     let frameIndex = 0;
@@ -525,6 +543,54 @@ const frames = [
     overflow: hidden;
   }
 
+  .solution-step .step-text {
+    display: inline;
+    position: relative;
+    font-weight: inherit;
+  }
+
+  .solution-step.bracketed-step .step-text::before,
+  .solution-step.bracketed-step .step-text::after {
+    content: '';
+    font-weight: 600;
+    display: inline;
+    color: var(--step-color);
+  }
+
+  .solution-step.bracketed-step[data-state='new'] .step-text::before {
+    content: '[[ ';
+  }
+
+  .solution-step.bracketed-step[data-state='new'] .step-text::after {
+    content: ' ]]';
+  }
+
+  .solution-step.bracketed-step[data-state='visible'] .step-text::before,
+  .solution-step.bracketed-step[data-state='sampling'] .step-text::before {
+    content: '[ ';
+  }
+
+  .solution-step.bracketed-step[data-state='visible'] .step-text::after,
+  .solution-step.bracketed-step[data-state='sampling'] .step-text::after {
+    content: ' ]';
+  }
+
+  .solution-step.bracketed-step[data-state='contracting'] .step-text::before {
+    content: '[[ ';
+  }
+
+  .solution-step.bracketed-step[data-state='contracting'] .step-text::after {
+    content: ' ]]';
+  }
+
+  .solution-step.bracketed-step[data-state='final'] .step-text::before {
+    content: '{{ ';
+  }
+
+  .solution-step.bracketed-step[data-state='final'] .step-text::after {
+    content: ' }}';
+  }
+
   .solution-step[data-state='hidden'] {
     opacity: 0;
     transform: translateY(12px);
@@ -539,7 +605,8 @@ const frames = [
   .solution-step[data-state='visible'],
   .solution-step[data-state='new'],
   .solution-step[data-state='contracting'],
-  .solution-step[data-state='final'] {
+  .solution-step[data-state='final'],
+  .solution-step[data-state='sampling'] {
     border-left-color: var(--step-color);
   }
 
@@ -554,15 +621,80 @@ const frames = [
     background: rgba(42, 47, 108, 0.03);
   }
 
+  .solution-step[data-state='sampling'] {
+    background: rgba(91, 96, 255, 0.08);
+  }
+
   .solution-step[data-state='final'] {
     box-shadow: 0 10px 28px rgba(42, 47, 108, 0.18);
     background: rgba(255, 255, 255, 0.95);
     color: var(--step-color);
   }
 
-  .solution-step[data-step-id='setup'][data-state='final'],
-  .solution-step[data-step-id='whichFinal'][data-state='final'] {
+  .solution-step[data-step-id='solutionLabel'] {
     font-weight: 600;
+    border-left-color: transparent !important;
+    background: transparent;
+    color: #2a2f6c;
+  }
+
+  .solution-step.sampling-step {
+    border-left-color: transparent !important;
+    background: rgba(91, 96, 255, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #2d36d1;
+  }
+
+  .sampling-step .sampling-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .sampling-step .spark {
+    width: 0.65rem;
+    height: 0.65rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.85), rgba(91, 96, 255, 0.65));
+    box-shadow: 0 0 12px rgba(91, 96, 255, 0.4);
+    animation: samplingPulse 1.6s ease-in-out infinite;
+    opacity: 0.5;
+  }
+
+  .sampling-step .spark:nth-child(2) {
+    animation-delay: 0.25s;
+  }
+
+  .sampling-step .spark:nth-child(3) {
+    animation-delay: 0.5s;
+  }
+
+  .solution-step[data-step-id='coreSetup'][data-state='final'],
+  .solution-step[data-step-id='constraint'][data-state='final'],
+  .solution-step[data-step-id='whichOnly'][data-state='final'] {
+    font-weight: 600;
+  }
+
+  .final-derivation-step {
+    --step-color: #d97706;
+    color: #704414;
+  }
+
+  [data-decomposition][data-active-tone='success'] .solution-step[data-state='final'] {
+    animation: finalGlow 3s ease-in-out infinite;
+  }
+
+  [data-decomposition][data-active-tone='success'] .solution-step[data-state='final']::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0), rgba(47, 122, 54, 0.2), rgba(255, 255, 255, 0));
+    transform: translateX(-120%);
+    animation: finalShimmer 3s linear infinite;
+    pointer-events: none;
   }
 
   .solution-footer {
@@ -597,6 +729,10 @@ const frames = [
     --step-color: #2a2f6c;
   }
 
+  .step-color-label {
+    --step-color: #2a2f6c;
+  }
+
   .step-color-constraint {
     --step-color: #5b4ef2;
   }
@@ -611,6 +747,10 @@ const frames = [
 
   .step-color-derivative {
     --step-color: #ec4899;
+  }
+
+  .step-color-sampling {
+    --step-color: #5b60ff;
   }
 
   .step-color-conclusion {
@@ -640,12 +780,51 @@ const frames = [
     }
   }
 
+  @keyframes samplingPulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+
   @keyframes statusShimmer {
     0% {
       transform: rotate(15deg) translateX(-120%);
     }
     100% {
       transform: rotate(15deg) translateX(120%);
+    }
+  }
+
+  @keyframes finalShimmer {
+    0% {
+      transform: translateX(-140%);
+      opacity: 0;
+    }
+    35% {
+      opacity: 0.7;
+    }
+    65% {
+      opacity: 0.7;
+    }
+    100% {
+      transform: translateX(140%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes finalGlow {
+    0%,
+    100% {
+      box-shadow: 0 12px 28px rgba(47, 122, 54, 0.12);
+    }
+    50% {
+      box-shadow: 0 18px 42px rgba(47, 122, 54, 0.28);
     }
   }
 
