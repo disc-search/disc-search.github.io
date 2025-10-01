@@ -117,7 +117,7 @@ const frames = [
     stepStates: { introCombined: 'visible' }
   },
   {
-    status: { label: 'Contracting to shorter prefix', tone: 'contract' },
+    status: { label: 'Contracting to core prefix', tone: 'contract' },
     stepStates: { introCombined: 'contracting', setup: 'new' }
   },
   {
@@ -141,19 +141,27 @@ const frames = [
     stepStates: { setup: 'visible', constraint: 'visible' }
   },
   {
-    status: { label: 'Deepening derivation…', tone: 'sampling' },
+    status: { label: 'Sampling refinements…', tone: 'sampling' },
+    stepStates: { setup: 'visible', constraint: 'visible' }
+  },
+  {
+    status: { label: 'Deepening derivation…', tone: 'commit' },
     stepStates: { setup: 'visible', constraint: 'visible', whichBecause: 'new' }
+  },
+  {
+    status: { label: 'Re-scoring derivative clause…', tone: 'sampling' },
+    stepStates: { setup: 'visible', constraint: 'visible', whichBecause: 'visible' }
   },
   {
     status: { label: 'Pruning derivative clause', tone: 'contract' },
     stepStates: { setup: 'visible', constraint: 'visible', whichBecause: 'contracting', which: 'new' }
   },
   {
-    status: { label: 'Rescoring hinge prefix…', tone: 'sampling' },
+    status: { label: 'Sampling hinge prefix…', tone: 'sampling' },
     stepStates: { setup: 'visible', constraint: 'visible', which: 'visible' }
   },
   {
-    status: { label: 'Verified optimal solution', tone: 'success' },
+    status: { label: 'Correct solution found', tone: 'success' },
     stepStates: {
       setup: 'final',
       constraint: 'final',
@@ -550,6 +558,11 @@ const frames = [
     box-shadow: 0 10px 28px rgba(42, 47, 108, 0.18);
     background: rgba(255, 255, 255, 0.95);
     color: var(--step-color);
+  }
+
+  .solution-step[data-step-id='setup'][data-state='final'],
+  .solution-step[data-step-id='whichFinal'][data-state='final'] {
+    font-weight: 600;
   }
 
   .solution-footer {

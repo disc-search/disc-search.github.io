@@ -1,4 +1,11 @@
 
+Possible animations:
+- Sampling animation: "..." anination with shimmering effect
+- Proposed candidate prefix animation: text being typed out
+- Contraction animation: text from the latest step being deleted until a certain point
+- Candidate prefix accepted and committed animation: text from the latest step being bolded and shimmering
+- Correct solution has been found animation: shimmering entire solution
+
 ---
 
 ### Problem
