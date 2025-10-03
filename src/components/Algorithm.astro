@@ -47,6 +47,175 @@ const highlights = [
       focuses on the most uncertain parts of the trajectory while skipping past the easy ones.
     </p>
 
+    <div class="decomposition-animation" data-disc-animation>
+      <div class="animation-card" aria-live="polite">
+        <div class="animation-header">
+          <span class="animation-title">Candidate trace playback</span>
+          <span class="animation-progress" data-frame-progress></span>
+        </div>
+        <div class="animation-body">
+          <pre class="animation-text" data-frame-text>Problem: A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?
+
+Solution:
+[Sampling DISC…]</pre>
+        </div>
+      </div>
+    </div>
+
+    <script is:inline>
+      const frames = [
+        {
+          label: 'Sampling',
+          mode: 'sampling',
+          copy: `Problem: A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?\n\nSolution:\n[[{shimmering sampling icon}]]`
+        },
+        {
+          label: 'Proposed prefix',
+          mode: 'typing',
+          copy: `Solution:\n[[Let the length of the rectangle be (l), width be (w). We want to maximize the area (A = lw) subject to the constraint (2l + 2w = 24).]]`
+        },
+        {
+          label: 'Sampling',
+          mode: 'sampling',
+          copy: `Solution:\n[Let the length of the rectangle be (l), width be (w). We want to maximize the area (A = lw) subject to the constraint (2l + 2w = 24).]\n[[{shimmering sampling icon}]]`
+        },
+        {
+          label: 'Contraction',
+          mode: 'contract',
+          copy: `Solution:\n[[Let the length of the rectangle be (l)]]`
+        },
+        {
+          label: 'Sampling',
+          mode: 'sampling',
+          copy: `Solution:\n[Let the length of the rectangle be (l)]\n[[{shimmering sampling icon}]]`
+        },
+        {
+          label: 'Accepted prefix',
+          mode: 'accept',
+          copy: `Solution:\n{{Let the length of the rectangle be (l)}}`
+        },
+        {
+          label: 'Proposed prefix',
+          mode: 'typing',
+          copy: `Solution:\n{{Let the length of the rectangle be (l)}}\n[[and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,]]`
+        },
+        {
+          label: 'Sampling',
+          mode: 'sampling',
+          copy: `Solution:\n{{Let the length of the rectangle be (l)}}\n[and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,]\n[[{shimmering sampling icon}]]`
+        },
+        {
+          label: 'Accepted prefix',
+          mode: 'accept',
+          copy: `Solution:\n{{Let the length of the rectangle be (l)}}\n{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}}\n[[{shimmering sampling icon}]]`
+        },
+        {
+          label: 'Proposed prefix',
+          mode: 'typing',
+          copy: `Solution:\n{{Let the length of the rectangle be (l)}}\n{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}}\n[[which because of the constraint can be expressed as (A = lw = l(12 - l) = 12l - l^2). To find the maximum area, we take the derivative of (A) with respect to (l) and set it to zero:]]`
+        },
+        {
+          label: 'Sampling',
+          mode: 'sampling',
+          copy: `Solution:\n{{Let the length of the rectangle be (l)}}\n{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}}\n[which because of the constraint can be expressed as (A = lw = l(12 - l) = 12l - l^2). To find the maximum area, we take the derivative of (A) with respect to (l) and set it to zero:]\n[[{shimmering sampling icon}]]`
+        },
+        {
+          label: 'Contraction',
+          mode: 'contract',
+          copy: `Solution:\n{{Let the length of the rectangle be (l)}}\n{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}}\n[[which]]`
+        },
+        {
+          label: 'Sampling',
+          mode: 'sampling',
+          copy: `Solution:\n{{Let the length of the rectangle be (l)}}\n{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}}\n[which]\n[[{shimmering sampling icon}]]`
+        },
+        {
+          label: 'Accepted solution',
+          mode: 'accept',
+          copy: `Solution:\n{{Let the length of the rectangle be (l)}}\n{{and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,}}\n{{which}}\nis (A = lw). Let (l = 12 - w) and plug into the area:\n\nA = (12 - w)w  =>  A = 12w - w^2\n\nDifferentiate: A'(w) = 12 - 2w\n\nSet derivative = 0 => w = 6\n\nThen l = 6. Therefore, the maximum area is\n\nA = lw = 6 x 6 = {{36}}`
+        }
+      ];
+
+      const root = document.querySelector('[data-disc-animation]');
+
+      if (root) {
+        const textEl = root.querySelector('[data-frame-text]');
+        const progressEl = root.querySelector('[data-frame-progress]');
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let frameIndex = 0;
+        let intervalId = null;
+
+        const iconPlaceholder = /\[\[\{shimmering sampling icon\}\]\]/gi;
+        const candidateBlock = /\[\[([^\]]+)\]\]/g;
+        const pendingBlock = /\[([^\]]+)\]/g;
+        const acceptedBlock = /\{\{([^}]+)\}\}/g;
+
+        const formatFrame = (raw) =>
+          raw
+            .replace(iconPlaceholder, () => '<span class="sampling-icon" role="img" aria-label="Sampling"></span>')
+            .replace(acceptedBlock, (_, text) => `<span class="accepted">${text}</span>`)
+            .replace(candidateBlock, (_, text) => `<span class="candidate">${text}</span>`)
+            .replace(pendingBlock, (_, text) => `<span class="pending">${text}</span>`);
+
+        const setFrame = (index, { instant = false } = {}) => {
+          const frame = frames[index];
+          const total = frames.length;
+          const prefix = frame.label ? `${frame.label} · ` : '';
+          root.dataset.mode = frame.mode;
+          progressEl.textContent = `${prefix}Frame ${index + 1} of ${total}`;
+
+          const formatted = formatFrame(frame.copy);
+
+          if (frame.mode === 'typing' && !prefersReducedMotion.matches && !instant) {
+            textEl.classList.remove('is-typing');
+            void textEl.offsetWidth;
+            textEl.classList.add('is-typing');
+          } else {
+            textEl.classList.remove('is-typing');
+          }
+
+          textEl.innerHTML = formatted;
+        };
+
+        const advanceFrame = () => {
+          frameIndex = (frameIndex + 1) % frames.length;
+          setFrame(frameIndex);
+        };
+
+        const clearLoop = () => {
+          if (intervalId) {
+            window.clearInterval(intervalId);
+            intervalId = null;
+          }
+        };
+
+        const startLoop = () => {
+          clearLoop();
+          if (!prefersReducedMotion.matches) {
+            intervalId = window.setInterval(advanceFrame, 3600);
+          }
+        };
+
+        const handleMotionChange = (event) => {
+          if (event.matches) {
+            clearLoop();
+            setFrame(frameIndex, { instant: true });
+          } else {
+            startLoop();
+          }
+        };
+
+        if (typeof prefersReducedMotion.addEventListener === 'function') {
+          prefersReducedMotion.addEventListener('change', handleMotionChange);
+        } else if (typeof prefersReducedMotion.addListener === 'function') {
+          prefersReducedMotion.addListener(handleMotionChange);
+        }
+
+        setFrame(frameIndex, { instant: true });
+        startLoop();
+      }
+    </script>
+
     <div class="workflow-grid">
       {workflowSteps.map((step) => (
         <article class="workflow-card">
@@ -96,6 +265,171 @@ const highlights = [
     margin: 0 auto 2.5rem auto;
     font-size: 1.1rem;
     color: #3f4455;
+  }
+
+  .decomposition-animation {
+    margin: 3rem auto 2rem auto;
+    max-width: 780px;
+  }
+
+  .animation-card {
+    background: #0c1028;
+    border-radius: 18px;
+    padding: 1.75rem;
+    box-shadow: 0 18px 42px rgba(28, 33, 86, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .animation-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(77, 140, 255, 0.16), rgba(255, 255, 255, 0));
+    pointer-events: none;
+    opacity: 0.75;
+    mix-blend-mode: screen;
+  }
+
+  .animation-header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .animation-title {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .animation-progress {
+    font-size: 0.85rem;
+    color: rgba(220, 228, 255, 0.7);
+  }
+
+  .animation-body {
+    position: relative;
+    z-index: 1;
+    background: rgba(12, 16, 40, 0.85);
+    border-radius: 14px;
+    padding: 1.5rem;
+    border: 1px solid rgba(99, 129, 255, 0.18);
+  }
+
+  .animation-text {
+    margin: 0;
+    font-family: 'IBM Plex Mono', 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', monospace;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: rgba(228, 234, 255, 0.92);
+    white-space: pre-wrap;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+  }
+
+  .animation-text.is-typing {
+    animation: type-reveal 1.2s steps(40) forwards;
+  }
+
+  .animation-text .candidate {
+    color: #5fa8ff;
+  }
+
+  .animation-text .pending {
+    color: rgba(228, 234, 255, 0.65);
+  }
+
+  .animation-text .accepted {
+    color: #ffe27a;
+    font-weight: 600;
+  }
+
+  .decomposition-animation[data-mode='accept'] .accepted {
+    background-image: linear-gradient(120deg, rgba(255, 226, 122, 0.15), rgba(255, 226, 122, 0.55), rgba(255, 226, 122, 0.15));
+    background-size: 200% 100%;
+    animation: sweep 2.8s ease-in-out infinite;
+  }
+
+  .sampling-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 999px;
+    background: radial-gradient(circle at 30% 30%, #ffffff, #8ab4ff 55%, rgba(12, 16, 40, 0));
+    box-shadow: 0 0 12px rgba(95, 168, 255, 0.6);
+  }
+
+  .decomposition-animation[data-mode='sampling'] .sampling-icon {
+    animation: shimmer 1.2s ease-in-out infinite;
+  }
+
+  .decomposition-animation[data-mode='sampling'] .animation-card {
+    box-shadow: 0 22px 46px rgba(77, 140, 255, 0.3);
+  }
+
+  @keyframes shimmer {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.85;
+    }
+    50% {
+      transform: scale(1.12);
+      opacity: 1;
+    }
+  }
+
+  @keyframes type-reveal {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes sweep {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: 0 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animation-text.is-typing,
+    .decomposition-animation[data-mode='accept'] .accepted,
+    .decomposition-animation[data-mode='sampling'] .sampling-icon {
+      animation: none;
+    }
+
+    .animation-card,
+    .decomposition-animation[data-mode='sampling'] .animation-card {
+      box-shadow: 0 18px 42px rgba(28, 33, 86, 0.25);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .animation-card {
+      padding: 1.25rem;
+    }
+
+    .animation-body {
+      padding: 1.25rem;
+    }
+
+    .animation-text {
+      font-size: 0.9rem;
+    }
   }
 
   .workflow-grid {
