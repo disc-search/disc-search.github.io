@@ -1,0 +1,506 @@
+---
+const frames = [
+  {
+    id: 'frame-1',
+    title: 'Frame 1 – Sampling',
+    caption: 'Sampling pause before proposing a prefix.',
+    duration: 2200,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line candidate icon-line" role="img" aria-label="Model sampling"><span class="shimmer-icon"></span></div>
+    `
+  },
+  {
+    id: 'frame-2',
+    title: 'Frame 2 – Proposed Candidate Prefix',
+    caption: 'Model proposes an initial reasoning prefix.',
+    duration: 3200,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line candidate">Let the length of the rectangle be (l), width be (w). We want to maximize the area (A = lw) subject to the constraint (2l + 2w = 24).</div>
+    `
+  },
+  {
+    id: 'frame-3',
+    title: 'Frame 3 – Sampling',
+    caption: 'DISC evaluates the proposed prefix.',
+    duration: 2600,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line hold">Let the length of the rectangle be (l), width be (w). We want to maximize the area (A = lw) subject to the constraint (2l + 2w = 24).</div>
+      <div class="line candidate icon-line" role="img" aria-label="Model sampling"><span class="shimmer-icon"></span></div>
+    `
+  },
+  {
+    id: 'frame-4',
+    title: 'Frame 4 – Contraction',
+    caption: 'The prefix contracts back to a shorter span.',
+    duration: 2200,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line candidate">Let the length of the rectangle be (l)</div>
+    `
+  },
+  {
+    id: 'frame-5',
+    title: 'Frame 5 – Sampling',
+    caption: 'DISC reassesses the shortened prefix.',
+    duration: 2200,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line hold">Let the length of the rectangle be (l)</div>
+      <div class="line candidate icon-line" role="img" aria-label="Model sampling"><span class="shimmer-icon"></span></div>
+    `
+  },
+  {
+    id: 'frame-6',
+    title: 'Frame 6 – Candidate Accepted',
+    caption: 'The prefix is committed into the solution.',
+    duration: 2600,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line committed">Let the length of the rectangle be (l)</div>
+    `
+  },
+  {
+    id: 'frame-7',
+    title: 'Frame 7 – Proposed Candidate Prefix',
+    caption: 'Another candidate extension is drafted.',
+    duration: 3200,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line committed">Let the length of the rectangle be (l)</div>
+      <div class="line candidate">and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,</div>
+    `
+  },
+  {
+    id: 'frame-8',
+    title: 'Frame 8 – Sampling',
+    caption: 'Candidate is evaluated before acceptance.',
+    duration: 2600,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line committed">Let the length of the rectangle be (l)</div>
+      <div class="line hold">and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,</div>
+      <div class="line candidate icon-line" role="img" aria-label="Model sampling"><span class="shimmer-icon"></span></div>
+    `
+  },
+  {
+    id: 'frame-9',
+    title: 'Frame 9 – Candidate Accepted + Sampling',
+    caption: 'Extension is committed, DISC continues sampling.',
+    duration: 3000,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line committed">Let the length of the rectangle be (l)</div>
+      <div class="line committed">and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,</div>
+      <div class="line candidate icon-line" role="img" aria-label="Model sampling"><span class="shimmer-icon"></span></div>
+    `
+  },
+  {
+    id: 'frame-10',
+    title: 'Frame 10 – Proposed Candidate Prefix',
+    caption: 'DISC drafts the next reasoning block.',
+    duration: 3200,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line committed">Let the length of the rectangle be (l)</div>
+      <div class="line committed">and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,</div>
+      <div class="line candidate">which because of the constraint can be expressed as (A = lw = l(12 - l) = 12l - l^2). To find the maximum area, we take the derivative of (A) with respect to (l) and set it to zero:</div>
+    `
+  },
+  {
+    id: 'frame-11',
+    title: 'Frame 11 – Sampling',
+    caption: 'Evaluation before committing the latest reasoning.',
+    duration: 2600,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line committed">Let the length of the rectangle be (l)</div>
+      <div class="line committed">and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,</div>
+      <div class="line hold">which because of the constraint can be expressed as (A = lw = l(12 - l) = 12l - l^2). To find the maximum area, we take the derivative of (A) with respect to (l) and set it to zero:</div>
+      <div class="line candidate icon-line" role="img" aria-label="Model sampling"><span class="shimmer-icon"></span></div>
+    `
+  },
+  {
+    id: 'frame-12',
+    title: 'Frame 12 – Contraction',
+    caption: 'DISC retracts to a shorter prefix for refinement.',
+    duration: 2200,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line committed">Let the length of the rectangle be (l)</div>
+      <div class="line committed">and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,</div>
+      <div class="line candidate">which</div>
+    `
+  },
+  {
+    id: 'frame-13',
+    title: 'Frame 13 – Sampling',
+    caption: 'Quick evaluation before final acceptance.',
+    duration: 2200,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line committed">Let the length of the rectangle be (l)</div>
+      <div class="line committed">and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,</div>
+      <div class="line hold">which</div>
+      <div class="line candidate icon-line" role="img" aria-label="Model sampling"><span class="shimmer-icon"></span></div>
+    `
+  },
+  {
+    id: 'frame-14',
+    title: 'Frame 14 – Candidate Accepted + Correct Solution Found',
+    caption: 'Full reasoning is accepted and the correct answer is highlighted.',
+    duration: 6000,
+    html: `
+      <div class="line"><span class="label">Problem:</span> A rectangle has a perimeter of 24 inches. What is the maximum possible area of the rectangle?</div>
+      <div class="line spacer"></div>
+      <div class="line"><span class="label">Solution:</span></div>
+      <div class="line committed">Let the length of the rectangle be (l)</div>
+      <div class="line committed">and the width of the rectangle be (w). Since the perimeter of the rectangle is 24 inches, we have that (2l + 2w = 24), so (l + w = 12). We wish to maximize the area of the rectangle,</div>
+      <div class="line committed">which</div>
+      <div class="line conclusion">is (A = lw). Let (l = 12 - w) and plug into the area:</div>
+      <div class="line conclusion">A = (12 - w)w  ⇒  A = 12w - w^2</div>
+      <div class="line conclusion">Differentiate: A'(w) = 12 - 2w</div>
+      <div class="line conclusion">Set derivative = 0 ⇒ w = 6</div>
+      <div class="line conclusion">Then l = 6. Therefore, the maximum area is</div>
+      <div class="line final-answer">A = lw = 6 × 6 = <strong>36</strong></div>
+    `
+  }
+];
+---
+<div class="dynamic-animation" data-disc-animation>
+  <div class="animation-header">
+    <div class="status-pill">Dynamic Decomposition Trace</div>
+    <div class="frame-indicator" data-frame-indicator>
+      {frames[0].title}
+    </div>
+  </div>
+
+  <div class="animation-canvas" data-frame-canvas set:html={frames[0].html}></div>
+
+  <div class="animation-footer">
+    <div class="caption" data-frame-caption>{frames[0].caption}</div>
+    <div class="progress-dots">
+      {frames.map((frame, index) => (
+        <span class={`dot${index === 0 ? ' active' : ''}`} data-frame-dot></span>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  const frames = {JSON.stringify(frames)};
+  const ROOT_SELECTOR = '[data-disc-animation]';
+  const timers = new Map();
+
+  const startAnimation = (root) => {
+    if (!root || root.dataset.initialised) return;
+    root.dataset.initialised = 'true';
+
+    const canvas = root.querySelector('[data-frame-canvas]');
+    const indicator = root.querySelector('[data-frame-indicator]');
+    const caption = root.querySelector('[data-frame-caption]');
+    const dots = Array.from(root.querySelectorAll('[data-frame-dot]'));
+
+    if (!canvas || !indicator || !caption || dots.length === 0) return;
+
+    let index = 0;
+
+    const setFrame = (nextIndex) => {
+      index = nextIndex % frames.length;
+      const frame = frames[index];
+      if (!frame) return;
+
+      canvas.innerHTML = frame.html;
+      indicator.textContent = frame.title;
+      caption.textContent = frame.caption;
+      dots.forEach((dot, dotIndex) => {
+        dot.classList.toggle('active', dotIndex === index);
+      });
+
+      canvas.classList.remove('animate-in');
+      void canvas.offsetWidth;
+      canvas.classList.add('animate-in');
+
+      const previousTimer = timers.get(root);
+      if (previousTimer) {
+        clearTimeout(previousTimer);
+      }
+      const timer = setTimeout(() => setFrame(index + 1), frame.duration);
+      timers.set(root, timer);
+    };
+
+    setFrame(0);
+  };
+
+  const initAll = () => {
+    const roots = document.querySelectorAll(ROOT_SELECTOR);
+    roots.forEach((root) => startAnimation(root));
+  };
+
+  const cleanupTimers = () => {
+    timers.forEach((timer) => clearTimeout(timer));
+    timers.clear();
+    document.querySelectorAll(ROOT_SELECTOR).forEach((root) => {
+      delete root.dataset.initialised;
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll, { once: true });
+  } else {
+    initAll();
+  }
+
+  window.addEventListener('astro:page-load', () => {
+    cleanupTimers();
+    initAll();
+  });
+</script>
+
+<style>
+  .dynamic-animation {
+    margin: 3rem auto;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(33, 37, 68, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .animation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .status-pill {
+    background: linear-gradient(135deg, #2a2f6c, #4f5bc1);
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+  }
+
+  .frame-indicator {
+    font-weight: 600;
+    color: #2a2f6c;
+    font-size: 1.05rem;
+  }
+
+  .animation-canvas {
+    background: #0d102b;
+    color: rgba(255, 255, 255, 0.92);
+    border-radius: 12px;
+    padding: 1.75rem;
+    font-family: 'IBM Plex Mono', 'Source Code Pro', Menlo, monospace;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    min-height: 260px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .animation-canvas.animate-in {
+    animation: frameFade 360ms ease-out;
+  }
+
+  @keyframes frameFade {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .line {
+    margin-bottom: 0.65rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+  }
+
+  .line:last-child {
+    margin-bottom: 0;
+  }
+
+  .line.spacer {
+    margin-bottom: 1.2rem;
+  }
+
+  .label {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    min-width: 5.5rem;
+  }
+
+  .candidate {
+    color: #c2c8ff;
+    position: relative;
+  }
+
+  .candidate::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(88, 115, 255, 0.15), rgba(180, 206, 255, 0));
+    opacity: 0;
+    animation: candidatePulse 1.8s infinite;
+  }
+
+  @keyframes candidatePulse {
+    0%, 100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .hold {
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .committed {
+    color: #70ffa8;
+    font-weight: 600;
+  }
+
+  .conclusion {
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .final-answer {
+    color: #0d102b;
+    background: #70ffa8;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+  }
+
+  .final-answer strong {
+    color: #0d102b;
+  }
+
+  .icon-line {
+    gap: 0.75rem;
+  }
+
+  .shimmer-icon {
+    --size: 18px;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffffff 0%, #9fa7ff 40%, rgba(159, 167, 255, 0) 70%);
+    position: relative;
+    flex: 0 0 auto;
+  }
+
+  .shimmer-icon::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid rgba(159, 167, 255, 0.25);
+    animation: shimmerPulse 1.6s infinite ease-in-out;
+  }
+
+  @keyframes shimmerPulse {
+    0%, 100% {
+      transform: scale(0.85);
+      opacity: 0.4;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+  }
+
+  .animation-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .caption {
+    color: #3f4455;
+    max-width: 540px;
+  }
+
+  .progress-dots {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(74, 77, 87, 0.25);
+    transition: background 180ms ease, transform 180ms ease;
+  }
+
+  .dot.active {
+    background: #2a2f6c;
+    transform: scale(1.35);
+  }
+
+  @media (max-width: 720px) {
+    .dynamic-animation {
+      padding: 1.5rem;
+      margin: 2.5rem auto;
+    }
+
+    .animation-canvas {
+      font-size: 0.9rem;
+      padding: 1.35rem;
+    }
+
+    .caption {
+      font-size: 0.9rem;
+    }
+  }
+</style>
