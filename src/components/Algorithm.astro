@@ -1,6 +1,5 @@
 ---
 // Algorithm.astro - Overview of the DISC dynamic decomposition workflow
-import DynamicDecompositionAnimation from './DynamicDecompositionAnimation.astro';
 const workflowSteps = [
   {
     title: 'Identify pivotal prefixes',
@@ -47,8 +46,6 @@ const highlights = [
       and dynamically decides whether to advance or contract the step size. The result is a search process that
       focuses on the most uncertain parts of the trajectory while skipping past the easy ones.
     </p>
-
-    <DynamicDecompositionAnimation />
 
     <div class="workflow-grid">
       {workflowSteps.map((step) => (
